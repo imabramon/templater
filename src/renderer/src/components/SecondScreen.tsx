@@ -1,4 +1,5 @@
-import { TableData, TemplateData, mockTableData, mockTemplateData } from '@renderer/api'
+import { mockTableData, mockTemplateData } from '@common/mock'
+import { TableData } from '@common/types'
 import { FC, useMemo, useReducer } from 'react'
 interface IRow {
   data: string[]

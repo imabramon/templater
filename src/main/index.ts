@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { readExcel, readWord } from './backend'
 
 function createWindow(): void {
   // Create the browser window.
@@ -78,6 +79,18 @@ ipcMain.handle('open-file', async () => {
     properties: ['openFile']
   })
   return data.filePaths[0]
+})
+
+ipcMain.handle('read-excel', async (_, ...args) => {
+  const path: string = args[0]
+  const res = await readExcel(path)
+  return res
+})
+
+ipcMain.handle('read-word', async (_, ...args) => {
+  const path: string = args[0]
+  const res = await readWord(path)
+  return res
 })
 
 // In this file you can include the rest of your app"s specific main process

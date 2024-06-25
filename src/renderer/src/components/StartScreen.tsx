@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { openFileDialog } from '@renderer/api'
+import { openFile, readExcel, readWord } from '@renderer/api'
 
 interface IFileSelect {
   selectFileHandler?: (string) => void
@@ -10,7 +10,7 @@ const FileSelect: FC<IFileSelect> = ({ selectFileHandler: selectFile = (): void 
   return (
     <div
       onClick={async () => {
-        const filename: string = await openFileDialog()
+        const filename: string = await openFile()
         selectFile(filename)
       }}
     >
@@ -33,10 +33,22 @@ export const StartScreen: FC<IStartScreen> = () => {
     }
   }, [templatePath, dataPath])
 
+  const handleExcel: (path: string) => void = async (path) => {
+    const tableData = await readExcel(path)
+    setDataPath(path)
+    console.log(tableData)
+  }
+
+  const handleWord: (path: string) => void = async (path) => {
+    const templateData = await readWord(path)
+    setTemplatePath(path)
+    console.log(templateData)
+  }
+
   return (
     <div>
-      <FileSelect title="Выберете шаблон" selectFileHandler={setTemplatePath} />
-      <FileSelect title="Выберете данные" selectFileHandler={setDataPath} />
+      <FileSelect title="Выберете шаблон" selectFileHandler={handleWord} />
+      <FileSelect title="Выберете данные" selectFileHandler={handleExcel} />
     </div>
   )
 }

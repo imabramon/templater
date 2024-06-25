@@ -1,22 +1,14 @@
-import { TableData, TemplateData } from '@common/types'
+import { mockTemplateData, mockTableData } from '@common/mock'
+import { OpenFile, ReadExcel, ReadWord, TableData, TemplateData } from '@common/types'
 
-export const mockTableData: TableData = {
-  header: ['Номер договора', 'ИНН', 'ФИО'],
-  rows: [
-    ['1', 'ИНН 1', 'Пупкин Вася'],
-    ['2', 'ИНН 2', 'Иванов Вася'],
-    ['3', 'ИНН 3', 'Васькин Вася']
-  ]
+export const readExcel: ReadExcel = async (path) => {
+  return window.api.readExcel(path)
 }
 
-export const readExcel: (path: string) => TableData = () => {
-  return mockTableData
+export const readWord: ReadWord = async (path) => {
+  return window.api.readWord(path)
 }
 
-export const mockTemplateData: TemplateData = {
-  header: ['number', 'inn', 'fullname']
-}
-
-export const readWord: (path: string) => TemplateData = () => {
-  return mockTemplateData
+export const openFile: OpenFile = async () => {
+  return window.api.openFile()
 }
