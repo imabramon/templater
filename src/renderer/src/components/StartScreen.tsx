@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { openFile, readExcel, readWord } from '@renderer/api'
+import { useTemplateData } from '@renderer/state'
 
 interface IFileSelect {
   selectFileHandler?: (string) => void
@@ -31,6 +32,7 @@ type Optional<T> = T | undefined
 export const StartScreen: FC<IStartScreen> = () => {
   const [templatePath, setTemplatePath] = useState<Optional<string>>(undefined)
   const [dataPath, setDataPath] = useState<Optional<string>>(undefined)
+  const [_, setTamplateData] = useTemplateData()
 
   useEffect(() => {
     if (templatePath && dataPath) {
@@ -48,6 +50,7 @@ export const StartScreen: FC<IStartScreen> = () => {
     const templateData = await readWord(path)
     setTemplatePath(path)
     console.log(templateData)
+    setTamplateData(templateData)
   }
 
   return (
