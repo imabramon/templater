@@ -71,12 +71,20 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.handle('open-file', async () => {
+ipcMain.handle('open-file', async (_, extensions: string[]) => {
   const data = await dialog.showOpenDialog({
     title: 'Open Dialogue',
     message: 'First Dialog',
     //pass 'openDirectory' to strictly open directories
-    properties: ['openFile']
+    properties: ['openFile'],
+    filters: !extensions
+      ? undefined
+      : [
+          {
+            name: 'Custom',
+            extensions
+          }
+        ]
   })
   return data.filePaths[0]
 })

@@ -12,6 +12,6 @@ export type ExcelData = {
 
 export type TableData = TemplateData & ExcelData
 
-export type OpenFile = () => Promise<string>
+export type OpenFile = (extensions?: string[]) => Promise<string>
 export type ReadExcel = (path: string) => Promise<TableData>
 export type ReadWord = (path: string) => Promise<TemplateData>

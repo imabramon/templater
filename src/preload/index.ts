@@ -11,7 +11,7 @@ export interface IAPI {
 
 // Custom APIs for renderer
 const api: IAPI = {
-  openFile: () => ipcRenderer.invoke('open-file'),
+  openFile: (extensions) => ipcRenderer.invoke('open-file', extensions),
   readExcel: (path) => ipcRenderer.invoke('read-excel', path),
   readWord: (path) => ipcRenderer.invoke('read-word', path)
 }

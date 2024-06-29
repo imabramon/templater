@@ -4,13 +4,18 @@ import { openFile, readExcel, readWord } from '@renderer/api'
 interface IFileSelect {
   selectFileHandler?: (string) => void
   title: string
+  extensions?: string[]
 }
 
-const FileSelect: FC<IFileSelect> = ({ selectFileHandler: selectFile = (): void => {}, title }) => {
+const FileSelect: FC<IFileSelect> = ({
+  selectFileHandler: selectFile = (): void => {},
+  title,
+  extensions
+}) => {
   return (
     <div
       onClick={async () => {
-        const filename: string = await openFile()
+        const filename: string = await openFile(extensions)
         selectFile(filename)
       }}
     >
@@ -47,8 +52,16 @@ export const StartScreen: FC<IStartScreen> = () => {
 
   return (
     <div>
-      <FileSelect title="Выберете шаблон" selectFileHandler={handleWord} />
-      <FileSelect title="Выберете данные" selectFileHandler={handleExcel} />
+      <FileSelect
+        title="Выберете шаблон"
+        selectFileHandler={handleWord}
+        extensions={['docx', 'doc']}
+      />
+      <FileSelect
+        title="Выберете данные"
+        selectFileHandler={handleExcel}
+        extensions={['xlsx', 'xls']}
+      />
     </div>
   )
 }
