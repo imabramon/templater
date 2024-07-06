@@ -7,6 +7,7 @@ import {
   SelectFolder,
   TableData
 } from '@common/types'
+import { dialog } from 'electron'
 
 export const openFileDialog: OpenFile = async () => {
   return 'test'
@@ -38,7 +39,14 @@ export const readWord: ReadWord = async (path) => {
 
 export const selectFolder: SelectFolder = async () => {
   console.log('select folder')
-  return 'some file'
+  const data = await dialog.showOpenDialog({
+    title: 'Open Dialogue',
+    message: 'First Dialog',
+    //pass 'openDirectory' to strictly open directories
+    properties: ['openDirectory']
+  })
+
+  return data.filePaths[0]
 }
 export const makeFilesByTemplate: MakeFilesByTemplate = async (
   templatePath,
