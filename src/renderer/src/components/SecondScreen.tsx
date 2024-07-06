@@ -1,11 +1,15 @@
-import { mockTableData, mockTemplateData } from '@common/mock'
 import { TableData } from '@common/types'
+import { selectFolder, makeFilesByTemplate } from '@renderer/api'
 import { useTemplateData } from '@renderer/state'
-import { useTableData } from '@renderer/state/hooks'
-import { FC, useMemo, useReducer } from 'react'
+import { useTableData, useTemplatePath } from '@renderer/state/hooks'
+import { FC, useEffect, useMemo, useReducer, useState } from 'react'
+
 interface IRow {
   data: string[]
 }
+
+const objectDependensies = (object): (typeof object)[keyof object] =>
+  Object.keys(object).map((key) => object[key])
 
 const Row: FC<IRow> = ({ data }) => {
   return (
@@ -20,9 +24,10 @@ const Row: FC<IRow> = ({ data }) => {
 interface ITableHeader {
   header: string[]
   templateNames: string[]
+  onChange: (map: Record<string, string>) => void
 }
 
-const TableHeader: FC<ITableHeader> = ({ header, templateNames }) => {
+const TableHeader: FC<ITableHeader> = ({ header, templateNames, onChange: change }) => {
   const initHeaderObject: { [name: string]: string } = useMemo(() => {
     return header.reduce((init, elem, index) => {
       init[elem] = templateNames[index]
@@ -39,7 +44,7 @@ const TableHeader: FC<ITableHeader> = ({ header, templateNames }) => {
 
   //   console.log(initHeaderObject, initTemplateObject)
 
-  const [{ headerTemplateMap }, dispath] = useReducer(
+  const [{ headerTemplateMap, templateHeaderMap }, dispath] = useReducer(
     (state, action) => {
       switch (action.type) {
         case 'switch': {
@@ -63,6 +68,12 @@ const TableHeader: FC<ITableHeader> = ({ header, templateNames }) => {
     },
     { headerTemplateMap: initHeaderObject, templateHeaderMap: initTemplateObject }
   )
+
+  useEffect(() => {
+    // console.log('change')
+    // console.log(templateHeaderMap)
+    change(templateHeaderMap)
+  }, [change, ...objectDependensies(templateHeaderMap)])
 
   return (
     <>
@@ -105,9 +116,10 @@ const TableHeader: FC<ITableHeader> = ({ header, templateNames }) => {
 interface ITable {
   data?: TableData
   templateNames?: string[]
+  onMapChange: (map: Record<string, string>) => void
 }
 
-const Table: FC<ITable> = () => {
+const Table: FC<ITable> = ({ onMapChange }) => {
   const [{ header: templateNames }] = useTemplateData()
   const [{ header, rows }] = useTableData()
   // const { rows, header } = data
@@ -115,14 +127,32 @@ const Table: FC<ITable> = () => {
 
   return (
     <table>
-      <TableHeader header={header} templateNames={templateNames} />
+      <TableHeader header={header} templateNames={templateNames} onChange={onMapChange} />
       {rowElements}
     </table>
   )
 }
 
 const SecondScreen: FC = () => {
-  return <Table />
+  const [namesMap, setNamesMap] = useState({})
+
+  const [templatePath] = useTemplatePath()
+  const [tableData] = useTableData()
+
+  const createFiles = async (): Promise<void> => {
+    const distanation = await selectFolder()
+    const result = await makeFilesByTemplate(templatePath, tableData, namesMap, distanation)
+    console.log(result)
+  }
+
+  return (
+    <div>
+      <button type="button" onClick={createFiles}>
+        Создать файлы
+      </button>
+      <Table onMapChange={setNamesMap} />
+    </div>
+  )
 }
 
 export default SecondScreen

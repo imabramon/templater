@@ -1,19 +1,24 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { ipcRenderer } from 'electron/renderer'
-import { OpenFile, ReadExcel, ReadWord } from '@common/types'
+import { MakeFilesByTemplate, OpenFile, ReadExcel, ReadWord, SelectFolder } from '@common/types'
 
 export interface IAPI {
   openFile: OpenFile
   readExcel: ReadExcel
   readWord: ReadWord
+  selectFolder: SelectFolder
+  makeFilesByTemplate: MakeFilesByTemplate
 }
 
 // Custom APIs for renderer
 const api: IAPI = {
   openFile: (extensions) => ipcRenderer.invoke('open-file', extensions),
   readExcel: (path) => ipcRenderer.invoke('read-excel', path),
-  readWord: (path) => ipcRenderer.invoke('read-word', path)
+  readWord: (path) => ipcRenderer.invoke('read-word', path),
+  selectFolder: () => ipcRenderer.invoke('select-folder'),
+  makeFilesByTemplate: (...args: Parameters<MakeFilesByTemplate>) =>
+    ipcRenderer.invoke('make-files-by-template', ...args)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

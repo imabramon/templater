@@ -1,5 +1,12 @@
 import { mockTableData, mockTemplateData } from '@common/mock'
-import { OpenFile, ReadExcel, ReadWord } from '@common/types'
+import {
+  MakeFilesByTemplate,
+  OpenFile,
+  ReadExcel,
+  ReadWord,
+  SelectFolder,
+  TableData
+} from '@common/types'
 
 export const openFileDialog: OpenFile = async () => {
   return 'test'
@@ -27,4 +34,34 @@ export const readWord: ReadWord = async (path) => {
     return match.join('').trim()
   })
   return { header }
+}
+
+export const selectFolder: SelectFolder = async () => {
+  console.log('select folder')
+  return 'some file'
+}
+export const makeFilesByTemplate: MakeFilesByTemplate = async (
+  templatePath,
+  tableData,
+  namesMap,
+  distanation
+) => {
+  console.log('call')
+  console.log(templatePath, tableData, namesMap, distanation)
+  return true
+}
+
+const makeMapper =
+  (map: Record<string, string>, header: TableData['header']) =>
+  (input: string): number =>
+    header.indexOf(map[input])
+
+const makeFile = async (
+  templateNames: string[],
+  data: string[],
+  mapper: (string) => number
+): Promise<boolean> => {
+  console.log('names', templateNames)
+  console.log('data', data)
+  return true
 }

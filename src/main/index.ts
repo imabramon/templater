@@ -2,7 +2,8 @@ import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { readExcel, readWord } from './backend'
+import { makeFilesByTemplate, readExcel, readWord, selectFolder } from './backend'
+import { MakeFilesByTemplate } from '@common/types'
 
 function createWindow(): void {
   // Create the browser window.
@@ -98,6 +99,16 @@ ipcMain.handle('read-excel', async (_, ...args) => {
 ipcMain.handle('read-word', async (_, ...args) => {
   const path: string = args[0]
   const res = await readWord(path)
+  return res
+})
+
+ipcMain.handle('select-folder', async () => {
+  const res = await selectFolder()
+  return res
+})
+
+ipcMain.handle('make-files-by-template', async (_, ...args: Parameters<MakeFilesByTemplate>) => {
+  const res = await makeFilesByTemplate(...args)
   return res
 })
 
