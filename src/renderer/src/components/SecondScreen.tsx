@@ -1,6 +1,7 @@
 import { mockTableData, mockTemplateData } from '@common/mock'
 import { TableData } from '@common/types'
 import { useTemplateData } from '@renderer/state'
+import { useTableData } from '@renderer/state/hooks'
 import { FC, useMemo, useReducer } from 'react'
 interface IRow {
   data: string[]
@@ -106,9 +107,10 @@ interface ITable {
   templateNames?: string[]
 }
 
-const Table: FC<ITable> = ({ data = mockTableData }) => {
+const Table: FC<ITable> = () => {
   const [{ header: templateNames }] = useTemplateData()
-  const { rows, header } = data
+  const [{ header, rows }] = useTableData()
+  // const { rows, header } = data
   const rowElements = rows.map((rowData, index) => <Row key={index} data={rowData} />)
 
   return (

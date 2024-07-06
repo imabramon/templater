@@ -1,10 +1,12 @@
 import { Store, configureStore } from '@reduxjs/toolkit'
 import wordReducer from './word'
+import excelReducer from './excel'
 // ...
 
 export const store: Store = configureStore({
   reducer: {
-    word: wordReducer
+    word: wordReducer,
+    excel: excelReducer
   }
 })
 

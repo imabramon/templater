@@ -1,2 +1,2 @@
 export { store } from './store'
-export { useTemplateData } from './hooks'
+export { useTemplateData, useTemplatePath, useTableData, useTablePath } from './hooks'

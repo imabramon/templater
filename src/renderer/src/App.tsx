@@ -1,13 +1,12 @@
 import { Provider } from 'react-redux'
-import SecondScreen from './components/SecondScreen'
-import { StartScreen } from './components/StartScreen'
 import { store } from './state'
+import { RouterProvider } from 'react-router-dom'
+import { router } from './routing'
 
 function App(): JSX.Element {
   return (
     <Provider store={store}>
-      <StartScreen />
-      <SecondScreen />
+      <RouterProvider router={router} />
     </Provider>
   )
 }

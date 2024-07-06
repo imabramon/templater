@@ -1,25 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from './store'
-import { mockTemplateData } from '@common/mock'
-import { TemplateData } from '@common/types'
+import { mockTableData } from '@common/mock'
+import { TableData } from '@common/types'
 
 interface ITemplateDataState {
   path: string
-  value: TemplateData
+  value: TableData
 }
 
 const initialState: ITemplateDataState = {
   path: '',
-  value: mockTemplateData
+  value: mockTableData
 }
 
-export const wordSlice = createSlice({
-  name: 'word',
+export const excelSlice = createSlice({
+  name: 'excel',
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    setData: (state, action: PayloadAction<TemplateData>) => {
+    setData: (state, action: PayloadAction<TableData>) => {
       state.value = action.payload
     },
     setPath: (state, action: PayloadAction<string>) => {
@@ -28,10 +28,10 @@ export const wordSlice = createSlice({
   }
 })
 
-export const { setData, setPath } = wordSlice.actions
+export const { setData, setPath } = excelSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
-export const selectTemplateData = (state: RootState): TemplateData => state.word.value
-export const selectTemplatePath = (state: RootState): string => state.word.path
+export const selectTableData = (state: RootState): TableData => state.excel.value
+export const selectTablePath = (state: RootState): string => state.excel.path
 
-export default wordSlice.reducer
+export default excelSlice.reducer

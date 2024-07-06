@@ -1,6 +1,7 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect } from 'react'
 import { openFile, readExcel, readWord } from '@renderer/api'
-import { useTemplateData } from '@renderer/state'
+import { useTemplateData, useTableData, useTablePath, useTemplatePath } from '@renderer/state'
+import { useNavigate } from 'react-router'
 
 interface IFileSelect {
   selectFileHandler?: (string) => void
@@ -25,32 +26,32 @@ const FileSelect: FC<IFileSelect> = ({
   )
 }
 
-interface IStartScreen {}
+export const StartScreen: FC = () => {
+  const [, setTemplateData] = useTemplateData()
+  const [templatePath, setTemplatePath] = useTemplatePath()
 
-type Optional<T> = T | undefined
+  const [, setTableData] = useTableData()
+  const [dataPath, setDataPath] = useTablePath()
 
-export const StartScreen: FC<IStartScreen> = () => {
-  const [templatePath, setTemplatePath] = useState<Optional<string>>(undefined)
-  const [dataPath, setDataPath] = useState<Optional<string>>(undefined)
-  const [_, setTamplateData] = useTemplateData()
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (templatePath && dataPath) {
       console.log('Переход', dataPath, templatePath)
+      navigate('/processing')
     }
   }, [templatePath, dataPath])
 
   const handleExcel: (path: string) => void = async (path) => {
     const tableData = await readExcel(path)
     setDataPath(path)
-    console.log(tableData)
+    setTableData(tableData)
   }
 
   const handleWord: (path: string) => void = async (path) => {
     const templateData = await readWord(path)
     setTemplatePath(path)
-    console.log(templateData)
-    setTamplateData(templateData)
+    setTemplateData(templateData)
   }
 
   return (
