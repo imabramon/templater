@@ -1,13 +1,11 @@
-import { mockTableData, mockTemplateData } from '@common/mock'
-import {
-  MakeFilesByTemplate,
-  OpenFile,
-  ReadExcel,
-  ReadWord,
-  SelectFolder,
-  TableData
-} from '@common/types'
+'use strict'
+
+import { MakeFilesByTemplate, OpenFile, ReadExcel, ReadWord, SelectFolder } from '@common/types'
+import Docxtemplater, { DXT } from 'docxtemplater'
 import { dialog } from 'electron'
+import { readFileSync, writeFileSync } from 'fs'
+import path from 'path'
+import PizZip from 'pizzip'
 
 export const openFileDialog: OpenFile = async () => {
   return 'test'
@@ -20,7 +18,7 @@ export const readExcel: ReadExcel = async (path) => {
   const sheet = wb.Sheets[sheetName]
   const raw_data = XLSX.utils.sheet_to_json(sheet, { header: 1 })
   const [header, ...rows] = raw_data
-  return { header, rows }
+  return { header: header.map((x) => `${x}`), rows }
 }
 
 const templateNameRegexp = /\{(\s)*(\w)*(\s)*\}/gm
@@ -54,22 +52,83 @@ export const makeFilesByTemplate: MakeFilesByTemplate = async (
   namesMap,
   distanation
 ) => {
-  console.log('call')
-  console.log(templatePath, tableData, namesMap, distanation)
+  const options = {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    parser: (tag) => {
+      const trimmed = tag.trim()
+      return {
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        get: (scope) => {
+          if (trimmed === '.') {
+            return scope
+          } else {
+            return scope[trimmed]
+          }
+        }
+      }
+    },
+    paragraphLoop: true,
+    linebreaks: true
+  }
+
+  const mapper = makeMapper(tableData.header, namesMap)
+  const makeFile = makeFileMaker(templatePath, options, mapper, distanation)
+
+  tableData.rows.forEach((row, index) => makeFile(row, `output_${index}.docx`))
+
   return true
 }
 
-const makeMapper =
-  (map: Record<string, string>, header: TableData['header']) =>
-  (input: string): number =>
-    header.indexOf(map[input])
+const makeFileMaker =
+  (
+    templatePath,
+    options: DXT.Options,
+    mapper: (data: string[]) => Record<string, string>,
+    distanation: string
+  ) =>
+  (data: string[], output: string): void => {
+    /**
+     * Создать док
+     * Создать объект [templateNames]: data[map[templateNames]]
+     * Срендерить ддок с этим объектов,
+     * Сохранить
+     */
+    const content = readFileSync(path.resolve(templatePath), 'binary')
+    const zip = new PizZip(content)
+    const doc = new Docxtemplater(zip, options)
+    const templateNamesToDataMap = mapper(data)
 
-const makeFile = async (
-  templateNames: string[],
-  data: string[],
-  mapper: (string) => number
-): Promise<boolean> => {
-  console.log('names', templateNames)
-  console.log('data', data)
-  return true
+    console.log(output)
+    console.log(templateNamesToDataMap)
+
+    doc.render(templateNamesToDataMap)
+
+    const buf = doc.getZip().generate({
+      type: 'nodebuffer',
+      compression: 'DEFLATE'
+    })
+
+    writeFileSync(path.resolve(distanation, output), buf)
+  }
+
+const makeMapper = (
+  header: string[],
+  namesMap: Record<string, string>
+): ((data: string[]) => Record<string, string>) => {
+  const map = {}
+
+  const templateNames = Object.keys(namesMap)
+
+  templateNames.forEach((element) => {
+    map[element] = header.indexOf(namesMap[element])
+  })
+
+  return (data: string[]): Record<string, string> => {
+    const obj = {}
+    templateNames.forEach((element) => {
+      obj[element] = data[map[element]]
+    })
+
+    return obj
+  }
 }

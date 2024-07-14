@@ -5,12 +5,12 @@ import { mockTableData } from '@common/mock'
 import { TableData } from '@common/types'
 
 interface ITemplateDataState {
-  path: string
+  path: string | undefined
   value: TableData
 }
 
 const initialState: ITemplateDataState = {
-  path: '',
+  path: undefined,
   value: mockTableData
 }
 

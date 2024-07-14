@@ -1,30 +1,50 @@
-import { FC, useEffect } from 'react'
-import { openFile, readExcel, readWord } from '@renderer/api'
+import { FC } from 'react'
+import { readExcel, readWord } from '@renderer/api'
 import { useTemplateData, useTableData, useTablePath, useTemplatePath } from '@renderer/state'
 import { useNavigate } from 'react-router'
+import { FileSelect } from './FileSelect'
+import DocIcon from '../assets/doc_file_icon.svg'
+import XlsIcon from '../assets/xls_file_icon.svg'
+import styled from 'styled-components'
 
-interface IFileSelect {
-  selectFileHandler?: (string) => void
-  title: string
-  extensions?: string[]
-}
+const Button = styled.button`
+  box-sizing: border-box;
+  width: 100%;
+  height: 50px;
+  border-radius: 16px;
+  display: flex;
+  border: none;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  gap: 8px;
 
-const FileSelect: FC<IFileSelect> = ({
-  selectFileHandler: selectFile = (): void => {},
-  title,
-  extensions
-}) => {
-  return (
-    <div
-      onClick={async () => {
-        const filename: string = await openFile(extensions)
-        selectFile(filename)
-      }}
-    >
-      {title}
-    </div>
-  )
-}
+  background-color: green;
+  color: white;
+
+  &:disabled {
+    background-color: grey;
+    color: black;
+  }
+`
+
+const Page = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+const Container = styled.div`
+  margin: auto;
+  width: 250px;
+  height: fit-content;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`
 
 export const StartScreen: FC = () => {
   const [, setTemplateData] = useTemplateData()
@@ -35,12 +55,12 @@ export const StartScreen: FC = () => {
 
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if (templatePath && dataPath) {
-      console.log('Переход', dataPath, templatePath)
-      navigate('/processing')
-    }
-  }, [templatePath, dataPath])
+  // useEffect(() => {
+  //   if (templatePath && dataPath) {
+  //     console.log('Переход', dataPath, templatePath)
+  //     navigate('/processing')
+  //   }s
+  // }, [templatePath, dataPath])
 
   const handleExcel: (path: string) => void = async (path) => {
     const tableData = await readExcel(path)
@@ -55,17 +75,29 @@ export const StartScreen: FC = () => {
   }
 
   return (
-    <div>
-      <FileSelect
-        title="Выберете шаблон"
-        selectFileHandler={handleWord}
-        extensions={['docx', 'doc']}
-      />
-      <FileSelect
-        title="Выберете данные"
-        selectFileHandler={handleExcel}
-        extensions={['xlsx', 'xls']}
-      />
-    </div>
+    <Page>
+      <Container>
+        <FileSelect
+          title="Выберете шаблон"
+          selectFileHandler={handleWord}
+          extensions={['docx', 'doc']}
+          path={templatePath}
+          icon={DocIcon}
+        />
+        <FileSelect
+          title="Выберете данные"
+          selectFileHandler={handleExcel}
+          extensions={['xlsx', 'xls']}
+          path={dataPath}
+          icon={XlsIcon}
+        />
+        <Button
+          disabled={templatePath === undefined || dataPath === undefined}
+          onClick={() => navigate('/processing')}
+        >
+          Template it!
+        </Button>
+      </Container>
+    </Page>
   )
 }
