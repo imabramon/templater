@@ -5,8 +5,7 @@ import { createBrowserRouter } from 'react-router-dom'
 export const router = createBrowserRouter([
   {
     path: '/',
-    // element: <StartScreen />
-    element: <SecondScreen />
+    element: <StartScreen />
   },
   {
     path: '/processing',
